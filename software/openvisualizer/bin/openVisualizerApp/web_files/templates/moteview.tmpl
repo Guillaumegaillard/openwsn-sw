@@ -42,6 +42,12 @@
 		                       <option>{{mote}}</option>
 		                    % end
 		                </select>
+		                <select class="rel_value_fld" id="mote_select_IoTLaB" size="1">
+		                    <option value="none">Select mote...</option>
+		                    % for mote in motelistIL:
+		                       <option>{{mote}}</option>
+		                    % end
+		                </select>
 		                <button id="toggle_btn" type="button" class="btn btn-default btn-xs">Toggle DAGroot state</button>
 		                <script>
 		                    $("#mote_select").change(function() {

@@ -28,7 +28,7 @@ from   openvisualizer.moteConnector import OpenParser
 #============================ functions =======================================
 
 BAUDRATE_TELOSB = 115200
-BAUDRATE_GINA   = 115200
+BAUDRATE_GINA   = 500000
 BAUDRATE_WSN430 = 115200
 
 def findSerialPorts():
@@ -58,6 +58,7 @@ def findSerialPorts():
                     serialports.append( (str(val[1]),BAUDRATE_WSN430) )
     elif os.name=='posix':
         serialports = [(s,BAUDRATE_GINA) for s in glob.glob('/dev/ttyUSB*')]
+	print('port est ouvert')
     
     # log
     log.info("discovered following COM port: {0}".format(['{0}@{1}'.format(s[0],s[1]) for s in serialports]))
@@ -172,6 +173,7 @@ class moteProbe(threading.Thread):
                     try:
                         if   self.mode==self.MODE_SERIAL:
                             rxBytes = self.serial.read(1)
+                            
                         elif self.mode==self.MODE_EMULATED:
                             rxBytes = self.serial.read()
                         elif self.mode==self.MODE_IOTLAB:
@@ -191,6 +193,7 @@ class moteProbe(threading.Thread):
                                         rxByte!=self.hdlc.HDLC_FLAG
                                     ):
                                 # start of frame
+
                                 if log.isEnabledFor(logging.DEBUG):
                                     log.debug("{0}: start of hdlc frame {1} {2}".format(self.name, u.formatStringBuf(self.hdlc.HDLC_FLAG), u.formatStringBuf(rxByte)))
                                 self.busyReceiving       = True
@@ -201,6 +204,7 @@ class moteProbe(threading.Thread):
                                         rxByte!=self.hdlc.HDLC_FLAG
                                     ):
                                 # middle of frame
+
                                 
                                 self.inputBuf           += rxByte
                             elif    (
@@ -208,6 +212,7 @@ class moteProbe(threading.Thread):
                                         rxByte==self.hdlc.HDLC_FLAG
                                     ):
                                 # end of frame
+
                                 if log.isEnabledFor(logging.DEBUG):
                                     log.debug("{0}: end of hdlc frame {1} ".format(self.name, u.formatStringBuf(rxByte)))
                                 self.busyReceiving       = False
@@ -216,6 +221,7 @@ class moteProbe(threading.Thread):
                                 try:
                                     tempBuf = self.inputBuf
                                     self.inputBuf        = self.hdlc.dehdlcify(self.inputBuf)
+
                                     if log.isEnabledFor(logging.DEBUG):
                                         log.debug("{0}: {2} dehdlcized input: {1}".format(self.name, u.formatStringBuf(self.inputBuf), u.formatStringBuf(tempBuf)))
                                 except OpenHdlc.HdlcException as err:
